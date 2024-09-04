@@ -1,16 +1,24 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ReactiveFormsModule ,ValidationErrors } from '@angular/forms';
+import {
+  FormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+  AbstractControl,
+  ReactiveFormsModule,
+  ValidationErrors,
+} from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { last } from 'rxjs';
 import { response } from 'express';
 import { error } from 'node:console';
-
-
-
+import { Injectable } from '@angular/core';
 
 // Custom validator to check for no whitespace or special characters
-function noWhitespaceOrSpecialChars(control: AbstractControl): ValidationErrors | null {
+function noWhitespaceOrSpecialChars(
+  control: AbstractControl
+): ValidationErrors | null {
   const value = control.value;
   const regex = /[\s!@#$%^&*(),.?":{}|<>]/g;
   return regex.test(value) ? { invalidChars: true } : null;
@@ -29,8 +37,9 @@ function dateRangeValidator(group: AbstractControl): ValidationErrors | null {
   const startDate = group.get('startDate')?.value;
   const endDate = group.get('endDate')?.value;
   // Example logic: Ensure endDate is after startDate
-  return startDate && endDate && new Date(startDate) > new Date(endDate) ?
-    { invalidDateRange: true } : null;
+  return startDate && endDate && new Date(startDate) > new Date(endDate)
+    ? { invalidDateRange: true }
+    : null;
 }
 
 @Component({
@@ -41,8 +50,7 @@ function dateRangeValidator(group: AbstractControl): ValidationErrors | null {
   styleUrls: ['./index.component.css'],
 })
 export class IndexComponent implements OnInit {
-
-userForm!: FormGroup;
+  userForm!: FormGroup;
 
   additionalDetails: string = '';
   isInquiry: any;
@@ -50,7 +58,6 @@ userForm!: FormGroup;
   choice: string = '';
   fullname: string = '';
   phone: string = '';
-
 
   bookingStatus: string = '';
   selectedHotelName: string = '';
@@ -85,9 +92,8 @@ userForm!: FormGroup;
   bookingTokens: number = 0; // To track the number of bookings
   lastBookingTime: Date | null = null; // To track the time of the last booking
 
-
-  typeOfComplain: any [] = [];
-  typeOfInquiry: any [] = [];
+  typeOfComplain: any[] = [];
+  typeOfInquiry: any[] = [];
   typeId: number = 0;
   type_complain: string = '';
   relatedComplain: any[] = [];
@@ -97,17 +103,14 @@ userForm!: FormGroup;
   selectedReletedComplainType: string = '';
   selectedReletedType: string = '';
   answer: any[] = [];
-  relatedCompAnswer: any[] =[];
+  relatedCompAnswer: any[] = [];
   botAnswer: string = '';
-
-
 
   messages: {
     sender: 'bot' | 'user' | undefined;
     text: string;
   }[] = [];
   noRegion: number = 0;
-
 
   constructor(private http: HttpClient, private user_form: FormBuilder) {}
 
@@ -121,35 +124,73 @@ userForm!: FormGroup;
   }
 
   /*
-    * Date validator methods that validate dates
-    * and check if they are valid and are of current
-    *
-  */
-
-
+   * Date validator methods that validate dates
+   * and check if they are valid and are of current
+   *
+   */
 
   createForm() {
-    this.userForm = this.user_form.group({
-      region: ['', [Validators.required, Validators.minLength(4), noWhitespaceOrSpecialChars]],
-      firstname: ['', [Validators.required, Validators.minLength(4), noWhitespaceOrSpecialChars]],
-      lastname: ['', [Validators.required, Validators.minLength(4), noWhitespaceOrSpecialChars]],
-      email: ['', [Validators.required, Validators.email]],
-      startDate: ['', [Validators.required, dateValidator('start')]],
-      endDate: ['', [Validators.required, dateValidator('end')]],
-      inquiryText: ['', [Validators.required, Validators.minLength(8)]],
-      additionalDetails: ['', [Validators.required, Validators.minLength(10)]],
-      fullname: ['', [Validators.minLength(4), noWhitespaceOrSpecialChars]],
-      phone: ['', [Validators.required, Validators.minLength(10), noWhitespaceOrSpecialChars]],
-      bookingNumber: ['', [Validators.required, Validators.minLength(5), noWhitespaceOrSpecialChars]]
-    }, { validators: dateRangeValidator });
+    this.userForm = this.user_form.group(
+      {
+        region: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(4),
+            noWhitespaceOrSpecialChars,
+          ],
+        ],
+        firstname: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(4),
+            noWhitespaceOrSpecialChars,
+          ],
+        ],
+        lastname: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(4),
+            noWhitespaceOrSpecialChars,
+          ],
+        ],
+        email: ['', [Validators.required, Validators.email]],
+        startDate: ['', [Validators.required, dateValidator('start')]],
+        endDate: ['', [Validators.required, dateValidator('end')]],
+        inquiryText: ['', [Validators.required, Validators.minLength(8)]],
+        additionalDetails: [
+          '',
+          [Validators.required, Validators.minLength(10)],
+        ],
+        fullname: ['', [Validators.minLength(4), noWhitespaceOrSpecialChars]],
+        phone: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(10),
+            noWhitespaceOrSpecialChars,
+          ],
+        ],
+        bookingNumber: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(5),
+            noWhitespaceOrSpecialChars,
+          ],
+        ],
+      },
+      { validators: dateRangeValidator }
+    );
   }
-
 
   // Date validator method
   dateValidator(type: 'start' | 'end') {
     return (control: AbstractControl): { [key: string]: any } | null => {
       if (!control.value) {
-        return null;  // Don't validate empty values to allow optional controls
+        return null; // Don't validate empty values to allow optional controls
       }
       const inputDate = new Date(control.value);
       if (type === 'start') {
@@ -193,10 +234,14 @@ userForm!: FormGroup;
       const start = new Date(startDate);
 
       // Set minEndDate to one day after start date
-      this.minEndDate = new Date(start.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      this.minEndDate = new Date(start.getTime() + 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0];
 
       // Set maxEndDate to 30 days after start date (adjust as needed)
-      this.maxEndDate = new Date(start.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      this.maxEndDate = new Date(start.getTime() + 30 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0];
 
       // Reset endDate if it's outside the new valid range
       const currentEndDate = this.userForm.get('endDate')?.value;
@@ -213,245 +258,266 @@ userForm!: FormGroup;
 
   //method to check what start date is being selected before freezing it in the end date form fields
   listenToStartDateChanges() {
-    this.userForm.get('startDate')?.valueChanges.subscribe(startDate => {
+    this.userForm.get('startDate')?.valueChanges.subscribe((startDate) => {
       if (startDate) {
         this.updateMinEndDate(startDate);
       }
     });
-
-
   }
-//********************* */  FILTER REGION INFORMATION**************
-searchRegion(event: Event) {
-  const inputElement = event.target as HTMLInputElement;
-  const query = inputElement.value;
-//  console.log(query);
-  if (query.length > 0) {
-    this.http.get<any[]>(`http://localhost:3000/region?name=${query}`)
-      .subscribe((response: any) => {
-        this.filteredRegions = response.data;
-
-      });
-  } else {
-    this.filteredRegions = [];
+  //********************* */  FILTER REGION INFORMATION**************
+  searchRegion(event: Event) {
+    const inputElement = event.target as HTMLInputElement;
+    const query = inputElement.value;
+    //  console.log(query);
+    if (query.length > 0) {
+      this.http
+        .get<any[]>(`http://192.168.123.55:3000/region?name=${query}`)
+        .subscribe((response: any) => {
+          this.filteredRegions = response.data;
+        });
+    } else {
+      this.filteredRegions = [];
+    }
   }
-}
 
-// Handle the selection of a region
-selectRegion(region: any) {
-  // this.region = region.name;
-  // Update the form control with the selected region name
-  this.userForm.get('region')?.setValue(region.name);
-  this.filteredRegions = []; // Clear the suggestions after selection
-}
-
-//Search Booking number
-searchBookingNo(action: Event) {
-  const bookingInput = action.target as HTMLInputElement;
-  const qry = bookingInput.value;
-
-  if(qry && qry.length > 0) {
-    this.http.get<any[]>(`http://localhost:3000/bookNo?number=${qry}`).subscribe(
-      (response: any) => {
-        this.filterdBookNo = response.data;
-      }, (error) => {
-        console.error('Error fetching booking numbers:', error);
-      }
-    );
-  } else {
-    // If qry is undefined or has no length, clear the filtered list
-    this.filterdBookNo = [];
+  // Handle the selection of a region
+  selectRegion(region: any) {
+    // this.region = region.name;
+    // Update the form control with the selected region name
+    this.userForm.get('region')?.setValue(region.name);
+    this.filteredRegions = []; // Clear the suggestions after selection
   }
-}
 
-//Handle the selection of a booking number
-selectBookNo(bkNo: any) {
+  //Search Booking number
+  searchBookingNo(action: Event) {
+    const bookingInput = action.target as HTMLInputElement;
+    const qry = bookingInput.value;
+
+    if (qry && qry.length > 0) {
+      this.http
+        .get<any[]>(`http://192.168.123.55:3000/bookNo?number=${qry}`)
+        .subscribe(
+          (response: any) => {
+            this.filterdBookNo = response.data;
+          },
+          (error) => {
+            console.error('Error fetching booking numbers:', error);
+          }
+        );
+    } else {
+      // If qry is undefined or has no length, clear the filtered list
+      this.filterdBookNo = [];
+    }
+  }
+
+  //Handle the selection of a booking number
+  selectBookNo(bkNo: any) {
     this.userForm.get('bookingNumber')?.setValue(bkNo.book_no);
     this.bookingNumber = this.userForm.get('bookingNumber')?.value;
     this.filterdBookNo = [];
-}
-
-//Method to get back one step
-returnStep() {
-  if(this.currentStep > 0) {
-    this.currentStep = this.currentStep - 1;
-    this.messages.pop();
   }
-  if(this.currentComplainStep > 0) {
-    this.currentComplainStep = this.currentComplainStep - 1;
-    this.messages.pop();
-  }
-  this.noRegion = 0;
-}
 
-handleYesNo(choice: string) {
-  if (this.currentComplainStep === 1) {
-    this.isInquiry = choice === 'Yes';
-    this.messages.push({
-      text: this.isInquiry ? 'Please enter your fullname and phone number.' : 'Please enter your booking number.',
-      sender: 'bot'
-    });
-    if(this.isInquiry === true) {
-      this.currentComplainStep = 2;
-    } else {
-      this.currentComplainStep = 7;
+  //Method to get back one step
+  returnStep() {
+    if (this.currentStep > 0) {
+      this.currentStep = this.currentStep - 1;
+      this.messages.pop();
     }
-  }
-
-  if(this.currentComplainStep === 4) {
-    this.isInquiry = choice === 'Yes';
-    this.messages.push({
-      text: this.isInquiry ? 'Please tell us more about your concern by select the option below' : 'Thank you for reaching out to us, we keep our services improved by reaching us throught this portal',
-      sender: 'bot'
-    });
-    // this.messages.push({
-    //   text: this.isInquiry ? 'Please confirm your booking details below' : 'Thank you for reaching out to us, we keep our services improved by reaching us throught this portal',
-    //   sender: 'bot'
-    // });
-    if(this.isInquiry === true) {
-      this.currentComplainStep = 5;
-    } else {
-      this.currentComplainStep = 8;
+    if (this.currentComplainStep > 0) {
+      this.currentComplainStep = this.currentComplainStep - 1;
+      this.messages.pop();
     }
+    this.noRegion = 0;
   }
 
-  if(this.currentComplainStep === 8) {
-    this.isInquiry = choice === 'Yes';
-    this.messages.push({
-      text: this.isInquiry ? `Please select type of complain below` : `Please enter the correct booking number`,
-      sender: 'bot'
-    });
-
-    if(this.isInquiry === true) {
-      this.currentComplainStep = 9;
-    } else {
-      this.currentComplainStep = 7;
-    }
-  }
-
-  if(this.currentComplainStep === 10) {
-    this.isInquiry = choice === 'Yes';
-    this.messages.push({
-      text: this.isInquiry ? `Yes` : `No`,
-      sender: `user`
-    });
-    this.messages.push({
-      text: this.isInquiry ? `You selected Yes, Thank you for giving us your thoughts, we will consider this in your booking` : `Please select related complain below`,
-      sender: `bot`
-    });
-
-    if(this.isInquiry === true) {
-      this.currentComplainStep = 13;
-    } else {
-      //For fetching more type of related complain
-      this.fetchRelatedComplain();
-      this.currentComplainStep = 11;
-    }
-  }
-}
-
-yesNo(choice: string) {
-  if (this.currentComplainStep === 4) {
-    if (this.isInquiry) {
-      this.choice = choice;
+  handleYesNo(choice: string) {
+    if (this.currentComplainStep === 1) {
+      this.isInquiry = choice === 'Yes';
       this.messages.push({
-        text: this.choice === 'Yes' ? 'Please provide more details about your inquiry.' : 'Thank you for your prompt response.',
-        sender: 'bot'
+        text: this.isInquiry
+          ? 'Please enter your fullname and phone number.'
+          : 'Please enter your booking number.',
+        sender: 'bot',
       });
-      if(this.choice === "No") {
+      if (this.isInquiry === true) {
+        this.currentComplainStep = 2;
+      } else {
+        this.currentComplainStep = 7;
+      }
+    }
+
+    if (this.currentComplainStep === 4) {
+      this.isInquiry = choice === 'Yes';
+      this.messages.push({
+        text: this.isInquiry
+          ? 'Please tell us more about your concern by select the option below'
+          : 'Thank you for reaching out to us, we keep our services improved by reaching us throught this portal',
+        sender: 'bot',
+      });
+      // this.messages.push({
+      //   text: this.isInquiry ? 'Please confirm your booking details below' : 'Thank you for reaching out to us, we keep our services improved by reaching us throught this portal',
+      //   sender: 'bot'
+      // });
+      if (this.isInquiry === true) {
+        this.currentComplainStep = 5;
+      } else {
+        this.currentComplainStep = 8;
+      }
+    }
+
+    if (this.currentComplainStep === 8) {
+      this.isInquiry = choice === 'Yes';
+      this.messages.push({
+        text: this.isInquiry
+          ? `Please select type of complain below`
+          : `Please enter the correct booking number`,
+        sender: 'bot',
+      });
+
+      if (this.isInquiry === true) {
+        this.currentComplainStep = 9;
+      } else {
+        this.currentComplainStep = 7;
+      }
+    }
+
+    if (this.currentComplainStep === 10) {
+      this.isInquiry = choice === 'Yes';
+      this.messages.push({
+        text: this.isInquiry ? `Yes` : `No`,
+        sender: `user`,
+      });
+      this.messages.push({
+        text: this.isInquiry
+          ? `You selected Yes, Thank you for giving us your thoughts, we will consider this in your booking`
+          : `Please select related complain below`,
+        sender: `bot`,
+      });
+
+      if (this.isInquiry === true) {
         this.currentComplainStep = 13;
       } else {
-        this.currentComplainStep = 5;
+        //For fetching more type of related complain
+        this.fetchRelatedComplain();
+        this.currentComplainStep = 11;
       }
-    } else {
-      this.messages.push({
-        text: choice === 'Yes' ? 'Please provide more details about your complaint.' : 'Thank you for your prompt response.',
-        sender: 'bot'
-      });
-      this.currentComplainStep = 5; // Move to the next step after selecting additional details
     }
   }
-}
 
-//Check match between the value entered and that from array comes from database for booking number
-isBookingNumberValid(): boolean {
-  const bookingNumber = this.userForm.get('bookingNumber')?.value;
-  // Check if the booking number exists in the filterdBookNo array
-  return this.filterdBookNo.some((bkn) => bkn.book_no === bookingNumber);
-}
-
-//Check match between the value entered and that from array comes from database for region name
-
-//Fetch value from booking table using booking number
-fetchBooking() {
-  const book_number = this.bookingNumber;
-  this.http.get(`http://localhost:3000/bkn?bkn=${book_number}`).subscribe(
-    (response: any) => {
-      this.returnedBookingDetails = response.data;
-    }, (error) => {
-      console.error('error fetching booking details: ', error);
+  yesNo(choice: string) {
+    if (this.currentComplainStep === 4) {
+      if (this.isInquiry) {
+        this.choice = choice;
+        this.messages.push({
+          text:
+            this.choice === 'Yes'
+              ? 'Please provide more details about your inquiry.'
+              : 'Thank you for your prompt response.',
+          sender: 'bot',
+        });
+        if (this.choice === 'No') {
+          this.currentComplainStep = 13;
+        } else {
+          this.currentComplainStep = 5;
+        }
+      } else {
+        this.messages.push({
+          text:
+            choice === 'Yes'
+              ? 'Please provide more details about your complaint.'
+              : 'Thank you for your prompt response.',
+          sender: 'bot',
+        });
+        this.currentComplainStep = 5; // Move to the next step after selecting additional details
+      }
     }
-  );
-}
+  }
 
-complainStep() {
-  switch(this.currentComplainStep) {
-    case 2:
-      if(this.userForm.get('fullname')?.valid && this.userForm.get('phone')?.valid) {
+  //Check match between the value entered and that from array comes from database for booking number
+  isBookingNumberValid(): boolean {
+    const bookingNumber = this.userForm.get('bookingNumber')?.value;
+    // Check if the booking number exists in the filterdBookNo array
+    return this.filterdBookNo.some((bkn) => bkn.book_no === bookingNumber);
+  }
+
+  //Check match between the value entered and that from array comes from database for region name
+
+  //Fetch value from booking table using booking number
+  fetchBooking() {
+    const book_number = this.bookingNumber;
+    this.http
+      .get(`http://192.168.123.55:3000/bkn?bkn=${book_number}`)
+      .subscribe(
+        (response: any) => {
+          this.returnedBookingDetails = response.data;
+        },
+        (error) => {
+          console.error('error fetching booking details: ', error);
+        }
+      );
+  }
+
+  complainStep() {
+    switch (this.currentComplainStep) {
+      case 2:
+        if (
+          this.userForm.get('fullname')?.valid &&
+          this.userForm.get('phone')?.valid
+        ) {
           this.fullname = this.userForm.get('fullname')?.value;
           this.phone = this.userForm.get('phone')?.value;
           this.messages.push({
             text: `fullname: ${this.fullname} and phone number is ${this.phone}`,
-            sender: `user`
+            sender: `user`,
           });
           this.messages.push({
             text: `Please select your inquiry from the list below`,
-            sender: `bot`
+            sender: `bot`,
           });
           this.fetchInquiry();
           this.currentComplainStep = 3;
-        }else {
+        } else {
           this.messages.push({
             text: 'please fill out enter your fullname and phone number',
-            sender: 'bot'
+            sender: 'bot',
           });
         }
-      break;
+        break;
       case 3:
         this.fetchInquiryAnswer();
         this.currentComplainStep = 4;
         break;
       case 5:
-        if(this.userForm.get('additionalDetails')?.valid) {
+        if (this.userForm.get('additionalDetails')?.valid) {
           this.inquiryText = this.userForm.get('additionalDetails')?.value;
           this.submitComplaint();
           this.currentComplainStep = 13;
         } else {
           this.messages.push({
             text: `Please provide your custom inquiry before submitting`,
-            sender: `bot`
+            sender: `bot`,
           });
         }
         break;
       case 6:
-          this.currentComplainStep = 13;
-          break;
+        this.currentComplainStep = 13;
+        break;
       case 7:
         this.messages.push({
           text: `My booking number is: ${this.bookingNumber}`,
-          sender: `user`
+          sender: `user`,
         });
         this.fetchBooking();
-        if(this.filterdBookNo) {
+        if (this.filterdBookNo) {
           this.messages.push({
             text: `Please confirm your booking details below`,
-            sender: `bot`
+            sender: `bot`,
           });
           this.currentComplainStep = 8;
         } else {
           this.messages.push({
             text: `Please enter a valid booking number`,
-            sender: `bot`
+            sender: `bot`,
           });
         }
 
@@ -468,13 +534,13 @@ complainStep() {
       case 13:
         this.messages.push({
           text: `Your complain has been processed successfully`,
-          sender: `bot`
+          sender: `bot`,
         });
+    }
   }
-}
 
-// *****************************************************************
-chooseOption(option: string) {
+  // *****************************************************************
+  chooseOption(option: string) {
     this.userChoice = option;
     this.messages = [];
 
@@ -492,11 +558,11 @@ chooseOption(option: string) {
       this.currentComplainStep = 1;
     }
   }
-
+  // steps for booking
   nextStep() {
     switch (this.currentStep) {
       case 1:
-      // fetch all region Name information hereee
+        // fetch all region Name information hereee
         if (this.userForm.get('region')?.valid) {
           // Proceed to next step
           this.region = this.userForm.get('region')?.value;
@@ -506,42 +572,48 @@ chooseOption(option: string) {
           console.log('Please enter a valid region');
           this.messages.push({
             text: 'Please enter a valid region before proceeding.',
-            sender: 'bot'
+            sender: 'bot',
           });
           this.filteredRegions = []; // Clear the suggestions after moving to the next step
           this.currentStep = 2;
         }
-    break;
+        break;
 
       case 2:
         //check if it is inquiry values or date values from form control
-        if(this.userForm.get('startDate')?.valid && this.userForm.get('endDate')?.valid) {
+        if (
+          this.userForm.get('startDate')?.valid &&
+          this.userForm.get('endDate')?.valid
+        ) {
           // Retrieve date values from form controls
-        const startDate = this.userForm.get('startDate')?.value;
-        const endDate = this.userForm.get('endDate')?.value;
+          const startDate = this.userForm.get('startDate')?.value;
+          const endDate = this.userForm.get('endDate')?.value;
 
-        if (startDate && endDate) {
-          this.startDate = startDate; // Set class properties
-          this.endDate = endDate;
+          if (startDate && endDate) {
+            this.startDate = startDate; // Set class properties
+            this.endDate = endDate;
 
-          if (this.userForm.get('startDate')?.valid && this.userForm.get('endDate')?.valid) {
-            this.calculateDays();
-            this.fetchHotels();
-            this.currentStep = 3; // Move to Step 3
+            if (
+              this.userForm.get('startDate')?.valid &&
+              this.userForm.get('endDate')?.valid
+            ) {
+              this.calculateDays();
+              this.fetchHotels();
+              this.currentStep = 3; // Move to Step 3
+            } else {
+              console.log('Please enter valid dates');
+              this.messages.push({
+                text: 'Please enter valid start and end dates before proceeding.',
+                sender: 'bot',
+              });
+            }
           } else {
-            console.log('Please enter valid dates');
+            console.log('Start date and end date are required');
             this.messages.push({
-              text: 'Please enter valid start and end dates before proceeding.',
-              sender: 'bot'
+              text: 'Start date and end date are required.',
+              sender: 'bot',
             });
           }
-        } else {
-          console.log('Start date and end date are required');
-          this.messages.push({
-            text: 'Start date and end date are required.',
-            sender: 'bot'
-          });
-        }
         }
         break;
       case 3:
@@ -604,7 +676,7 @@ chooseOption(option: string) {
     const regionName = encodeURIComponent(this.region); // Ensure regionName is set
     // Fetch the region ID based on the region name
     this.http
-      .get(`http://localhost:3000/region/id?name=${regionName}`)
+      .get(`http://192.168.123.55:3000/region/id?name=${regionName}`)
       .subscribe(
         (response: any) => {
           if (response.status) {
@@ -613,7 +685,9 @@ chooseOption(option: string) {
 
             // Now fetch available hotels based on the start date, end date, and region ID
             this.http
-              .get(`http://localhost:3000/available?region_id=${this.regionId}`)
+              .get(
+                `http://192.168.123.55:3000/available?region_id=${this.regionId}`
+              )
               .subscribe(
                 (response: any) => {
                   if (response.status) {
@@ -670,7 +744,7 @@ chooseOption(option: string) {
     if (!this.selectedHotel) return;
 
     this.http
-      .get(`http://localhost:3000/rooms?hotel_id=${this.selectedHotel}`)
+      .get(`http://192.168.123.55:3000/rooms?hotel_id=${this.selectedHotel}`)
       .subscribe(
         (response: any) => {
           if (response.status) {
@@ -754,25 +828,26 @@ chooseOption(option: string) {
   }
 
   fetchRelatedComplain() {
-    const compId = this.selectedType
-    this.http.get(`http://localhost:3000/relatedType?compId=${compId}`).subscribe(
-      (response: any) => {
+    const compId = this.selectedType;
+    this.http
+      .get(`http://192.168.123.55:3000/relatedType?compId=${compId}`)
+      .subscribe((response: any) => {
         this.relatedComplain = response.data;
-      }
-    )
+      });
   }
-
 
   onComplainSelect(complainId: number) {
     // Update selected related complain type
     this.selectedReletedComplainType = complainId.toString();
 
     // Push a message indicating user's selected complaint
-    const selectedComplaint = this.relatedComplain.find(c => c.rid === complainId);
+    const selectedComplaint = this.relatedComplain.find(
+      (c) => c.rid === complainId
+    );
     if (selectedComplaint) {
       this.messages.push({
         text: `You selected: ${selectedComplaint.complain}`,
-        sender: 'user'
+        sender: 'user',
       });
     }
 
@@ -784,95 +859,63 @@ chooseOption(option: string) {
   fetchRelatedComplainAnswer() {
     console.log(this.currentComplainStep);
     const relatedCompId = parseInt(this.selectedReletedComplainType, 10);
-    this.http.get(`http://localhost:3000/relatedAnswer?relatedCompId=${relatedCompId}`).subscribe(
-      (response: any) => {
-        if (response.status) {
-          this.relatedCompAnswer = response.data;
-          console.log(this.relatedCompAnswer);
-          this.relatedCompAnswer.forEach((item: any) => {
-            this.relatedCompAnsResult(item.answer_complain);
-          });
+    this.http
+      .get(
+        `http://192.168.123.55:3000/relatedAnswer?relatedCompId=${relatedCompId}`
+      )
+      .subscribe(
+        (response: any) => {
+          if (response.status) {
+            this.relatedCompAnswer = response.data;
+            console.log(this.relatedCompAnswer);
+            this.relatedCompAnswer.forEach((item: any) => {
+              this.relatedCompAnsResult(item.answer_complain);
+            });
+          }
+        },
+        (error) => {
+          console.error('Error fetching related complain answers', error);
         }
-      },
-      (error) => {
-        console.error('Error fetching related complain answers', error);
-      }
-    );
+      );
   }
 
   relatedCompAnsResult(ans: string) {
     this.botAnswer = ans;
     this.messages.push({
       text: `${this.botAnswer}`,
-      sender: `bot`
+      sender: `bot`,
     });
   }
 
-
-
-  // fetchRelatedComplainAnswer() {
-  //   console.log(this.currentComplainStep);
-  //   const relatedCompId = parseInt(this.selectedReletedComplainType, 10);
-  //   this.http.get(`http://localhost:3000/relatedAnswer?relatedCompId=${relatedCompId}`).subscribe(
-  //     (response: any) => {
-  //       if(response.status) {
-  //         this.relatedCompAnswer = response.data;
-  //         console.log(this.relatedCompAnswer);
-  //         this.relatedCompAnswer.forEach((item: any) => {
-  //           this.relatedCompAnsResult(item.answer_complain);
-  //         });
-  //       }
-  //     });
-  // }
-
-  // typeRelatedComplainAnsSelected(id: string) {
-  //   this.selectedType = id;
-  //   console.log(this.selectedType);
-  //   const selectType = this.relatedCompAnswer.find((rtoc) => rtoc.id === id);
-  //   this.type_complain = selectType ? selectType.answer_complain : '';
-  //   this.messages.push({
-  //     text: `My option is: ${this.type_complain}`,
-  //     sender: `user`
-  //   });
-  //   this.complainStep();
-  // }
-
-  // relatedCompAnsResult(ans: string) {
-  //   this.botAnswer = ans;
-  //   this.messages.push({
-  //     text: `${this.botAnswer}`,
-  //     sender: `bot`
-  //   });
-  // }
-
   //Fetch type of inuiry a user can select from
   fetchInquiry() {
-    this.http.get('http://localhost:3000/inquiryType').subscribe(
-      (response: any) => {
+    this.http
+      .get('http://192.168.123.55:3000/inquiryType')
+      .subscribe((response: any) => {
         this.typeOfInquiry = response.data;
-      }
-    )
+      });
   }
-
 
   // Fetch answer of the selected type of complain
   fetchInquiryAnswer() {
     const id = parseInt(this.selectedInquiryType, 10);
-    this.http.get(`http://localhost:3000/inquiryAnswer?answer=${id}`).subscribe(
-      (response: any) => {
-        if (response.status) {
-          this.answer = response.data;
-          this.answer.forEach((item: any) => {
-            this.ansResult(item.answer);
-          });
-        } else {
-          console.log('No answer found for the given complaint type.');
+    this.http
+      .get(`http://192.168.123.55:3000/inquiryAnswer?answer=${id}`)
+      .subscribe(
+        (response: any) => {
+          if (response.status) {
+            this.answer = response.data;
+            this.answer.forEach((item: any) => {
+              this.ansResult(item.answer);
+            });
+          } else {
+            console.log('No answer found for the given complaint type.');
+          }
+        },
+        (error) => {
+          console.error('Error fetching answer:', error);
         }
-      },
-      (error) => {
-        console.error('Error fetching answer:', error);
-      }
-    );
+      );
   }
 
   //Get selected type of complain
@@ -882,19 +925,18 @@ chooseOption(option: string) {
     this.type_inquiry = selectedType ? selectedType.inquiry : '';
     this.messages.push({
       text: `My option is: ${this.type_inquiry}`,
-      sender: 'user'
+      sender: 'user',
     });
     this.complainStep();
   }
 
-
   //Fetch type of complain a user can select from
   fetchComplain() {
-    this.http.get('http://localhost:3000/complainType').subscribe(
-      (response: any) => {
+    this.http
+      .get('http://192.168.123.55:3000/complainType')
+      .subscribe((response: any) => {
         this.typeOfComplain = response.data;
-      }
-    )
+      });
   }
 
   //Get selected type of complain
@@ -905,7 +947,7 @@ chooseOption(option: string) {
     console.log(this.currentComplainStep);
     this.messages.push({
       text: `My option is: ${this.type_complain}`,
-      sender: 'user'
+      sender: 'user',
     });
     this.complainStep();
   }
@@ -913,7 +955,7 @@ chooseOption(option: string) {
   // Fetch answer of the selected type of complain
   fetchAnswer() {
     const id = parseInt(this.selectedType, 10);
-    this.http.get(`http://localhost:3000/answer?answer=${id}`).subscribe(
+    this.http.get(`http://192.168.123.55:3000/answer?answer=${id}`).subscribe(
       (response: any) => {
         if (response.status) {
           this.answer = response.data;
@@ -934,17 +976,15 @@ chooseOption(option: string) {
     this.botAnswer = ans;
     this.messages.push({
       text: `${this.botAnswer}`,
-      sender: 'bot'
+      sender: 'bot',
     });
   }
-
-
 
   bookRoom() {
     const now = new Date();
     if (this.canBook(now)) {
       this.http
-        .get(`http://localhost:3000/region/id?name=${this.region}`)
+        .get(`http://192.168.123.55:3000/region/id?name=${this.region}`)
         .subscribe(
           (response: any) => {
             if (response.status) {
@@ -952,7 +992,7 @@ chooseOption(option: string) {
               this.regionName = response.name;
 
               this.http
-                .post(`http://localhost:3000/booking/create`, {
+                .post(`http://192.168.123.55:3000/booking/create`, {
                   firstname: this.firstname,
                   lastname: this.lastname,
                   email: this.email,
@@ -968,8 +1008,8 @@ chooseOption(option: string) {
                   (response: any) => {
                     if (response.status) {
                       this.bookingStatus = 'success';
+
                       this.updateTokenTracking(now); // Update token tracking
-                      this.resetChat(); // Optionally reset chat after successful booking
                     } else {
                       this.bookingStatus = 'failed';
                       this.messages.push({
@@ -977,12 +1017,14 @@ chooseOption(option: string) {
                         sender: 'bot',
                       });
                     }
+                    this.startCountdown(5000); // Start countdown for 5 seconds
                   },
                   (error) => {
                     this.messages.push({
                       text: 'An error occurred while booking. Please try again later.',
                       sender: 'bot',
                     });
+                    this.startCountdown(5000); // Start countdown for 5 seconds
                   }
                 );
             } else {
@@ -1013,11 +1055,13 @@ chooseOption(option: string) {
     }
     // ##########################################################################
     const timeDiff = (now.getTime() - this.lastBookingTime.getTime()) / 1000; // Time difference in seconds
-    if (timeDiff > 60) { // Reset the token count after a minute
+    if (timeDiff > 60) {
+      // Reset the token count after a minute
       this.bookingTokens = 0;
     }
     // set booking limit through token
-    if (this.bookingTokens >= 2) { // Assuming the limit is 10 bookings in an hour
+    if (this.bookingTokens >= 2) {
+      // Assuming the limit is 10 bookings in an hour
       return false;
     }
     return true;
@@ -1037,11 +1081,12 @@ chooseOption(option: string) {
 
   submitComplaint() {
     if (this.inquiryText) {
-      this.http.post('http://localhost:3000/inquiry', {
-        fullname: this.fullname,
-        phone: this.phone,
-        customDesc: this.inquiryText,
-        inquiryId: this.selectedInquiryType
+      this.http
+        .post('http://192.168.123.55:3000/inquiry', {
+          fullname: this.fullname,
+          phone: this.phone,
+          customDesc: this.inquiryText,
+          inquiryId: this.selectedInquiryType,
         })
         .subscribe(
           (response: any) => {
@@ -1076,7 +1121,6 @@ chooseOption(option: string) {
   resetChat() {
     this.currentStep = 0;
     this.userChoice = '';
-    this.bookingStatus = '';
     this.selectedHotel = '';
     this.selectedRoom = 0;
     this.region = '';

@@ -8,7 +8,12 @@ const cookieParser = require('cookie-parser');
 
 
 // Enable CORS for all origins
-server.use(cors());
+// server.use(cors());
+server.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 server.use(bodyParser.json());
 server.use(express.urlencoded({ extended: true }));
 server.use(cookieParser());
@@ -666,7 +671,7 @@ server.get('/rooms', (req, res) => {
 });
 
 // Specify the port
-server.listen(3000, function check(error) {
+server.listen(3000,'0.0.0.0', function check(error) {
   if (error) {
     console.log("Error.....!!!");
   } else {
