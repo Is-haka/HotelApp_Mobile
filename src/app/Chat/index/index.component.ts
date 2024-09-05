@@ -13,7 +13,6 @@ import { HttpClient } from '@angular/common/http';
 import { last } from 'rxjs';
 import { response } from 'express';
 import { error } from 'node:console';
-import { Injectable } from '@angular/core';
 
 // Custom validator to check for no whitespace or special characters
 function noWhitespaceOrSpecialChars(
@@ -271,7 +270,7 @@ export class IndexComponent implements OnInit {
     //  console.log(query);
     if (query.length > 0) {
       this.http
-        .get<any[]>(`http://192.168.123.55:3000/region?name=${query}`)
+        .get<any[]>(`http://localhost:3000/region?name=${query}`)
         .subscribe((response: any) => {
           this.filteredRegions = response.data;
         });
@@ -295,7 +294,7 @@ export class IndexComponent implements OnInit {
 
     if (qry && qry.length > 0) {
       this.http
-        .get<any[]>(`http://192.168.123.55:3000/bookNo?number=${qry}`)
+        .get<any[]>(`http://localhost:3000/bookNo?number=${qry}`)
         .subscribe(
           (response: any) => {
             this.filterdBookNo = response.data;
@@ -445,16 +444,14 @@ export class IndexComponent implements OnInit {
   //Fetch value from booking table using booking number
   fetchBooking() {
     const book_number = this.bookingNumber;
-    this.http
-      .get(`http://192.168.123.55:3000/bkn?bkn=${book_number}`)
-      .subscribe(
-        (response: any) => {
-          this.returnedBookingDetails = response.data;
-        },
-        (error) => {
-          console.error('error fetching booking details: ', error);
-        }
-      );
+    this.http.get(`http://localhost:3000/bkn?bkn=${book_number}`).subscribe(
+      (response: any) => {
+        this.returnedBookingDetails = response.data;
+      },
+      (error) => {
+        console.error('error fetching booking details: ', error);
+      }
+    );
   }
 
   complainStep() {
@@ -558,7 +555,7 @@ export class IndexComponent implements OnInit {
       this.currentComplainStep = 1;
     }
   }
-  // steps for booking
+
   nextStep() {
     switch (this.currentStep) {
       case 1:
@@ -676,7 +673,7 @@ export class IndexComponent implements OnInit {
     const regionName = encodeURIComponent(this.region); // Ensure regionName is set
     // Fetch the region ID based on the region name
     this.http
-      .get(`http://192.168.123.55:3000/region/id?name=${regionName}`)
+      .get(`http://localhost:3000/region/id?name=${regionName}`)
       .subscribe(
         (response: any) => {
           if (response.status) {
@@ -685,9 +682,7 @@ export class IndexComponent implements OnInit {
 
             // Now fetch available hotels based on the start date, end date, and region ID
             this.http
-              .get(
-                `http://192.168.123.55:3000/available?region_id=${this.regionId}`
-              )
+              .get(`http://localhost:3000/available?region_id=${this.regionId}`)
               .subscribe(
                 (response: any) => {
                   if (response.status) {
@@ -744,7 +739,7 @@ export class IndexComponent implements OnInit {
     if (!this.selectedHotel) return;
 
     this.http
-      .get(`http://192.168.123.55:3000/rooms?hotel_id=${this.selectedHotel}`)
+      .get(`http://localhost:3000/rooms?hotel_id=${this.selectedHotel}`)
       .subscribe(
         (response: any) => {
           if (response.status) {
@@ -830,7 +825,7 @@ export class IndexComponent implements OnInit {
   fetchRelatedComplain() {
     const compId = this.selectedType;
     this.http
-      .get(`http://192.168.123.55:3000/relatedType?compId=${compId}`)
+      .get(`http://localhost:3000/relatedType?compId=${compId}`)
       .subscribe((response: any) => {
         this.relatedComplain = response.data;
       });
@@ -860,9 +855,7 @@ export class IndexComponent implements OnInit {
     console.log(this.currentComplainStep);
     const relatedCompId = parseInt(this.selectedReletedComplainType, 10);
     this.http
-      .get(
-        `http://192.168.123.55:3000/relatedAnswer?relatedCompId=${relatedCompId}`
-      )
+      .get(`http://localhost:3000/relatedAnswer?relatedCompId=${relatedCompId}`)
       .subscribe(
         (response: any) => {
           if (response.status) {
@@ -887,10 +880,45 @@ export class IndexComponent implements OnInit {
     });
   }
 
+  // fetchRelatedComplainAnswer() {
+  //   console.log(this.currentComplainStep);
+  //   const relatedCompId = parseInt(this.selectedReletedComplainType, 10);
+  //   this.http.get(`http://localhost:3000/relatedAnswer?relatedCompId=${relatedCompId}`).subscribe(
+  //     (response: any) => {
+  //       if(response.status) {
+  //         this.relatedCompAnswer = response.data;
+  //         console.log(this.relatedCompAnswer);
+  //         this.relatedCompAnswer.forEach((item: any) => {
+  //           this.relatedCompAnsResult(item.answer_complain);
+  //         });
+  //       }
+  //     });
+  // }
+
+  // typeRelatedComplainAnsSelected(id: string) {
+  //   this.selectedType = id;
+  //   console.log(this.selectedType);
+  //   const selectType = this.relatedCompAnswer.find((rtoc) => rtoc.id === id);
+  //   this.type_complain = selectType ? selectType.answer_complain : '';
+  //   this.messages.push({
+  //     text: `My option is: ${this.type_complain}`,
+  //     sender: `user`
+  //   });
+  //   this.complainStep();
+  // }
+
+  // relatedCompAnsResult(ans: string) {
+  //   this.botAnswer = ans;
+  //   this.messages.push({
+  //     text: `${this.botAnswer}`,
+  //     sender: `bot`
+  //   });
+  // }
+
   //Fetch type of inuiry a user can select from
   fetchInquiry() {
     this.http
-      .get('http://192.168.123.55:3000/inquiryType')
+      .get('http://localhost:3000/inquiryType')
       .subscribe((response: any) => {
         this.typeOfInquiry = response.data;
       });
@@ -899,23 +927,21 @@ export class IndexComponent implements OnInit {
   // Fetch answer of the selected type of complain
   fetchInquiryAnswer() {
     const id = parseInt(this.selectedInquiryType, 10);
-    this.http
-      .get(`http://192.168.123.55:3000/inquiryAnswer?answer=${id}`)
-      .subscribe(
-        (response: any) => {
-          if (response.status) {
-            this.answer = response.data;
-            this.answer.forEach((item: any) => {
-              this.ansResult(item.answer);
-            });
-          } else {
-            console.log('No answer found for the given complaint type.');
-          }
-        },
-        (error) => {
-          console.error('Error fetching answer:', error);
+    this.http.get(`http://localhost:3000/inquiryAnswer?answer=${id}`).subscribe(
+      (response: any) => {
+        if (response.status) {
+          this.answer = response.data;
+          this.answer.forEach((item: any) => {
+            this.ansResult(item.answer);
+          });
+        } else {
+          console.log('No answer found for the given complaint type.');
         }
-      );
+      },
+      (error) => {
+        console.error('Error fetching answer:', error);
+      }
+    );
   }
 
   //Get selected type of complain
@@ -933,7 +959,7 @@ export class IndexComponent implements OnInit {
   //Fetch type of complain a user can select from
   fetchComplain() {
     this.http
-      .get('http://192.168.123.55:3000/complainType')
+      .get('http://localhost:3000/complainType')
       .subscribe((response: any) => {
         this.typeOfComplain = response.data;
       });
@@ -955,7 +981,7 @@ export class IndexComponent implements OnInit {
   // Fetch answer of the selected type of complain
   fetchAnswer() {
     const id = parseInt(this.selectedType, 10);
-    this.http.get(`http://192.168.123.55:3000/answer?answer=${id}`).subscribe(
+    this.http.get(`http://localhost:3000/answer?answer=${id}`).subscribe(
       (response: any) => {
         if (response.status) {
           this.answer = response.data;
@@ -984,7 +1010,7 @@ export class IndexComponent implements OnInit {
     const now = new Date();
     if (this.canBook(now)) {
       this.http
-        .get(`http://192.168.123.55:3000/region/id?name=${this.region}`)
+        .get(`http://localhost:3000/region/id?name=${this.region}`)
         .subscribe(
           (response: any) => {
             if (response.status) {
@@ -992,7 +1018,7 @@ export class IndexComponent implements OnInit {
               this.regionName = response.name;
 
               this.http
-                .post(`http://192.168.123.55:3000/booking/create`, {
+                .post(`http://localhost:3000/booking/create`, {
                   firstname: this.firstname,
                   lastname: this.lastname,
                   email: this.email,
@@ -1008,8 +1034,8 @@ export class IndexComponent implements OnInit {
                   (response: any) => {
                     if (response.status) {
                       this.bookingStatus = 'success';
-
                       this.updateTokenTracking(now); // Update token tracking
+                      this.resetChat(); // Optionally reset chat after successful booking
                     } else {
                       this.bookingStatus = 'failed';
                       this.messages.push({
@@ -1017,14 +1043,12 @@ export class IndexComponent implements OnInit {
                         sender: 'bot',
                       });
                     }
-                    this.startCountdown(5000); // Start countdown for 5 seconds
                   },
                   (error) => {
                     this.messages.push({
                       text: 'An error occurred while booking. Please try again later.',
                       sender: 'bot',
                     });
-                    this.startCountdown(5000); // Start countdown for 5 seconds
                   }
                 );
             } else {
@@ -1082,7 +1106,7 @@ export class IndexComponent implements OnInit {
   submitComplaint() {
     if (this.inquiryText) {
       this.http
-        .post('http://192.168.123.55:3000/inquiry', {
+        .post('http://localhost:3000/inquiry', {
           fullname: this.fullname,
           phone: this.phone,
           customDesc: this.inquiryText,
@@ -1121,6 +1145,7 @@ export class IndexComponent implements OnInit {
   resetChat() {
     this.currentStep = 0;
     this.userChoice = '';
+    this.bookingStatus = '';
     this.selectedHotel = '';
     this.selectedRoom = 0;
     this.region = '';
