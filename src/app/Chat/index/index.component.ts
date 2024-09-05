@@ -128,6 +128,12 @@ export class IndexComponent implements OnInit {
    *
    */
 
+  isChatOpen = false;
+
+  toggleChat() {
+    this.isChatOpen = !this.isChatOpen;
+  }
+
   createForm() {
     this.userForm = this.user_form.group(
       {
@@ -156,8 +162,8 @@ export class IndexComponent implements OnInit {
           ],
         ],
         email: ['', [Validators.required, Validators.email]],
-        startDate: ['', [Validators.required, dateValidator('start')]],
-        endDate: ['', [Validators.required, dateValidator('end')]],
+        startDate: ['', [Validators.required, this.dateValidator('start')]],
+        endDate: ['', [Validators.required, this.dateValidator('end')]],
         inquiryText: ['', [Validators.required, Validators.minLength(8)]],
         additionalDetails: [
           '',
@@ -181,7 +187,7 @@ export class IndexComponent implements OnInit {
           ],
         ],
       },
-      { validators: dateRangeValidator }
+      { validators: this.dateRangeValidator }
     );
   }
 
@@ -1035,7 +1041,6 @@ export class IndexComponent implements OnInit {
                     if (response.status) {
                       this.bookingStatus = 'success';
                       this.updateTokenTracking(now); // Update token tracking
-                      this.resetChat(); // Optionally reset chat after successful booking
                     } else {
                       this.bookingStatus = 'failed';
                       this.messages.push({
@@ -1043,12 +1048,14 @@ export class IndexComponent implements OnInit {
                         sender: 'bot',
                       });
                     }
+                    this.startCountdown(5000);
                   },
                   (error) => {
                     this.messages.push({
                       text: 'An error occurred while booking. Please try again later.',
                       sender: 'bot',
                     });
+                    this.startCountdown(5000);
                   }
                 );
             } else {
@@ -1100,6 +1107,7 @@ export class IndexComponent implements OnInit {
     this.countdownActive = true;
     setTimeout(() => {
       this.resetChat();
+      this.startNewBooking();
     }, duration);
   }
 
@@ -1142,10 +1150,14 @@ export class IndexComponent implements OnInit {
     }
   }
 
+  startNewBooking() {
+    this.bookingStatus = 'nextBooking';
+    this.resetChat();
+  }
+
   resetChat() {
     this.currentStep = 0;
     this.userChoice = '';
-    this.bookingStatus = '';
     this.selectedHotel = '';
     this.selectedRoom = 0;
     this.region = '';

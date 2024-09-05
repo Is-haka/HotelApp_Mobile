@@ -1,10 +1,13 @@
 <div class="container mt-5">
   <div class="row justify-content-center">
-    <div class="col-md-8">
-      <div class="container">
+    <div class="col-md-12">
+      <div class="">
         <div class="card-body">
-          <h2 class="card-title text-center mb-4">
-            Welcome to Hotel Chatting System
+          <h2
+            class="card-title text-center mb-4"
+            style="font-size: 20px !important"
+          >
+            Welcome to Hotel Chat System
           </h2>
 
           <div class="chat-container">
@@ -28,10 +31,10 @@
               </div>
               <div *ngIf="noRegion === 1">
                 <button
-                  class="btn btn-sm border-warning rounded mt-2"
+                  class="btn btn-sm border-outline-secondary mt-2"
                   (click)="returnStep()"
                 >
-                  <i class="fas fa-step-backward fa-sm text-warning fa-fw"></i>
+                  <i class="fas fa-step-backward fa-sm text-light fa-fw"></i>
                 </button>
                 &nbsp;
               </div>
@@ -40,7 +43,7 @@
             <!-- Display options initially -->
             <div
               *ngIf="currentStep === 0 && currentComplainStep === 0"
-              class="row g-3"
+              class="start-card d-flex flex-column flex-lg-row g-3"
             >
               <div class="col-md-6">
                 <div
@@ -52,7 +55,10 @@
                   >
                     <h5 class="card-title">
                       Booking
-                      <i class="fas fa-link fa-xm fa-fw text-primary"></i>
+                      <i
+                        class="fas fa-link fa-xm fa-fw"
+                        style="color: #5abcb9"
+                      ></i>
                     </h5>
                     <p class="card-text">Start booking a room</p>
                   </div>
@@ -68,7 +74,10 @@
                   >
                     <h5 class="card-title">
                       Complaints/Inquiry
-                      <i class="fas fa-link fa-xm fa-fw text-primary"></i>
+                      <i
+                        class="fas fa-link fa-xm fa-fw"
+                        style="color: #5abcb9"
+                      ></i>
                     </h5>
                     <p class="card-text">Submit a complaint or inquiry</p>
                   </div>
@@ -123,11 +132,11 @@
                   </ul>
 
                   <button
-                    class="btn btn-sm border-warning rounded mt-2"
+                    class="btn btn-sm border-outline-secondary mt-2"
                     (click)="returnStep()"
                   >
                     <i
-                      class="fas fa-step-backward fa-sm text-warning fa-fw"
+                      class="fas fa-step-backward fa-sm text-secondary fa-fw"
                     ></i>
                   </button>
                   &nbsp;
@@ -217,11 +226,11 @@
                     End date must be after start date.
                   </div>
                   <button
-                    class="btn btn-sm border-warning rounded mt-2"
+                    class="btn btn-sm border-outline-secondary mt-2"
                     (click)="returnStep()"
                   >
                     <i
-                      class="fas fa-step-backward fa-sm text-warning fa-fw"
+                      class="fas fa-step-backward fa-sm text-secondary fa-fw"
                     ></i>
                   </button>
                   &nbsp;
@@ -256,11 +265,11 @@
                 <!-- Step 4: Select Room Type -->
                 <div *ngIf="currentStep === 4" class="mb-3">
                   <button
-                    class="btn btn-sm border-warning rounded m-2"
+                    class="btn btn-sm border-outline-secondary m-2"
                     (click)="returnStep()"
                   >
                     <i
-                      class="fas fa-step-backward fa-sm text-warning fa-fw"
+                      class="fas fa-step-backward fa-sm text-secondary fa-fw"
                     ></i>
                   </button>
                   &nbsp;
@@ -371,11 +380,11 @@
                     </div>
                   </div>
                   <button
-                    class="btn btn-sm border-warning rounded mt-2"
+                    class="btn btn-sm border-outline-secondary mt-2"
                     (click)="returnStep()"
                   >
                     <i
-                      class="fas fa-step-backward fa-sm text-warning fa-fw"
+                      class="fas fa-step-backward fa-sm text-secondary fa-fw"
                     ></i>
                   </button>
                   &nbsp;
@@ -440,9 +449,9 @@
             </div>
 
             <!-- Complaints/Inquiry process -->
-            <div *ngIf="userChoice === 'Complaints/Inquiry'" class="mt-4">
+            <div *ngIf="userChoice === 'Complaints/Inquiry'" class="mt-1">
               <div *ngIf="currentComplainStep === 1" class="mb-3 text-start">
-                <span class="p-2 rounded bg-light text-dark"
+                <span class="p-2 rounded bg-light text-dark yesNo"
                   >Click <strong>'Yes'</strong> for inquiry or
                   <strong>'No'</strong> for complaints about a booking</span
                 >
@@ -450,11 +459,11 @@
                   class="d-flex align-items-center position-relative justify-content-start mt-2"
                 >
                   <button
-                    class="btn btn-sm border-warning rounded"
+                    class="btn btn-sm border-outline-secondary"
                     (click)="returnStep()"
                   >
                     <i
-                      class="fas fa-step-backward fa-sm text-warning fa-fw"
+                      class="fas fa-step-backward fa-sm text-secondary fa-fw"
                     ></i>
                   </button>
                   &nbsp;
@@ -507,7 +516,7 @@
                   </div>
                   <div class="form-group m-2">
                     <input
-                      type="text"
+                      type="tel"
                       class="form-control form-control-sm"
                       placeholder="Your phone number"
                       formControlName="phone"
@@ -533,11 +542,11 @@
                     </div>
                   </div>
                   <button
-                    class="btn btn-sm border-warning rounded"
+                    class="btn btn-sm border-outline-secondary"
                     (click)="returnStep()"
                   >
                     <i
-                      class="fas fa-step-backward fa-sm text-warning fa-fw"
+                      class="fas fa-step-backward fa-sm text-secondary fa-fw"
                     ></i>
                   </button>
                   &nbsp;
@@ -566,7 +575,7 @@
                   </div>
                 </div>
                 <div *ngIf="currentComplainStep === 4" class="mb-3 text-start">
-                  <span class="p-2 rounded bg-light text-dark"
+                  <span class="p-2 rounded bg-light text-dark yesNo"
                     >Click <strong>'Yes'</strong> if you have more details or
                     <strong>'No'</strong> to submit your inquiry</span
                   >
@@ -574,11 +583,11 @@
                     class="d-flex align-items-center position-relative justify-content-start mt-2"
                   >
                     <button
-                      class="btn btn-sm border-warning rounded"
+                      class="btn btn-sm border-outline-secondary"
                       (click)="returnStep()"
                     >
                       <i
-                        class="fas fa-step-backward fa-sm text-warning fa-fw"
+                        class="fas fa-step-backward fa-sm text-secondary fa-fw"
                       ></i>
                     </button>
                     &nbsp;
@@ -659,6 +668,15 @@
                       >
                     </div>
                     <button
+                      class="btn btn-sm border-outline-secondary"
+                      (click)="returnStep()"
+                    >
+                      <i
+                        class="fas fa-step-backward fa-sm text-secondary fa-fw"
+                      ></i>
+                    </button>
+                    &nbsp;
+                    <button
                       class="btn btn-sm btn-primary mt-2"
                       [disabled]="userForm.get('bookingNumber')?.invalid"
                       (click)="complainStep()"
@@ -723,7 +741,7 @@
                         </p>
                       </div>
                       <div class="card-footer bg-white">
-                        <span class="p-2 rounded bg-light text-dark"
+                        <span class="p-2 rounded bg-light text-dark yesNo"
                           >Click <strong>'Yes'</strong> if this information is
                           correct <strong>'No'</strong> if not</span
                         >
@@ -731,11 +749,11 @@
                           class="d-flex align-items-center position-relative justify-content-start mt-2"
                         >
                           <button
-                            class="btn btn-sm border-warning rounded"
+                            class="btn btn-sm border-outline-secondary"
                             (click)="returnStep()"
                           >
                             <i
-                              class="fas fa-step-backward fa-sm text-warning fa-fw"
+                              class="fas fa-step-backward fa-sm text-secondary fa-fw"
                             ></i>
                           </button>
                           &nbsp;
@@ -770,7 +788,7 @@
                   </div>
                 </div>
                 <div *ngIf="currentComplainStep === 10" class="mb-3">
-                  <span class="p-2 rounded bg-light text-dark"
+                  <span class="p-2 rounded bg-light text-dark yesNo"
                     >Click <strong>'Yes'</strong> if satisfactory or
                     <strong>'No'</strong> for more answer</span
                   >
@@ -778,11 +796,11 @@
                     class="d-flex align-items-center position-relative justify-content-start mt-2"
                   >
                     <button
-                      class="btn btn-sm border-warning rounded"
+                      class="btn btn-sm border-outline-secondary"
                       (click)="returnStep()"
                     >
                       <i
-                        class="fas fa-step-backward fa-sm text-warning fa-fw"
+                        class="fas fa-step-backward fa-sm text-secondary fa-fw"
                       ></i>
                     </button>
                     &nbsp;
